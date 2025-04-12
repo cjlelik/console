@@ -3,8 +3,11 @@
 
 #include "main.h"
 
+#define button_delay 12
+
 typedef struct{
 	uint8_t value;
+	uint8_t state;
 	uint8_t timer;
 }button_Typedef;
 

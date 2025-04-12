@@ -1,6 +1,15 @@
 #ifndef MENU_INC_MENU_H_
 #define MENU_INC_MENU_H_
 
+typedef const struct{
+	void       *Next;
+	void       *Previous;
+	void       *Parent;
+	void       *Child;
+	uint8_t     Value;
+	const char  Text[];
+} menuItem;
+
 enum {
     MENU_CANCEL=1,
     MENU_RESET,
@@ -13,8 +22,11 @@ enum {
     MENU_PROCESS
 };
 
-const char* MenuNext(void);
-const char* MenuPrevious(void);
+void MenuDown(void);
+void MenuUp(void);
+void MenuRight(void);
+void MenuLeft(void);
+menuItem* MenuGetItem(void);
 void MenuInit(void);
 
 #endif /* MENU_INC_MENU_H_ */

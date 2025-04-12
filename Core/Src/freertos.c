@@ -134,26 +134,17 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	xsprintf(vbuff, "%d", c++);
-	LcdSizePutStr(vbuff, 0, 0, 1, 1, LCD_Color_Black);
-	xsprintf(vbuff, "B=%-03d|%-03d|%-03d|%-03d", buttons.Left.value, buttons.Right.value, buttons.Up.value, buttons.Down.value);
-	LcdSizePutStr(vbuff, 0, 1*8*1, 1, 1, LCD_Color_Black);
-	xsprintf(vbuff, "Light=%-03d", led_value);
-	LcdSizePutStr(vbuff, 0, 2*8*1, 1, 1, LCD_Color_Black);
 	BUTTON_SetValue(buttons.A.value, buttons.C.value, 0, 160, &led_value);
 	if(buttons.B.value){led_value = 0;}
 	LedLightSet(led_value, led_value);
 
-	if(buttons.Down.value)
-	{
-		xsprintf(vbuff, "Text=%7S", MenuNext());
-		LcdSizePutStr(vbuff, 0, 3*8*1, 1, 1, LCD_Color_Black);
-	}
-	if(buttons.Up.value)
-	{
-		xsprintf(vbuff, "Text=%7S", MenuPrevious());
-		LcdSizePutStr(vbuff, 0, 3*8*1, 1, 1, LCD_Color_Black);
-	}
+	if(buttons.Down.state){buttons.Down.state = 0; MenuDown();}
+	if(buttons.Up.state){buttons.Up.state = 0; MenuUp();}
+	if(buttons.Left.state){buttons.Left.state = 0; MenuLeft();}
+	if(buttons.Right.state){buttons.Right.state = 0; MenuRight();}
+
+	xsprintf(vbuff, "%-12S %-03D", MenuGetItem()->Text, MenuGetItem()->Value);
+	LcdSizePutStr(vbuff, 0, 1*8*2, 1, 2, LCD_Color_Black);
 
     osDelay(50);
   }
@@ -176,10 +167,10 @@ void Peryphery(void const * argument)
   {
 	LcdGraphicsRedrawDMA();
 	BUTTON_GetState(&buttons);
-	/*if(led_pwm == 255){dir=0;}
+	if(led_pwm == 255){dir=0;}
 	if(led_pwm == 0){dir=1;}
 	if(dir == 1){led_pwm+=3;}else{led_pwm-=3;}
-	TIM2->CCR4 = led_pwm;*/
+	TIM2->CCR4 = led_pwm;
 	osDelay(40);
   }
   /* USER CODE END Peryphery */

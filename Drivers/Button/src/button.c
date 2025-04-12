@@ -18,15 +18,17 @@ void _BUTTON_PROCESSING(GPIO_TypeDef *gpio_port, uint16_t gpio_pin, button_Typed
 	{//Нажата кнопка
 
 		if(button->value == 255){return;}
-		if(button->timer++ == 0){button->value = 1;}
-		if(button->timer > 8)
+		if(button->timer++ == 0){button->state = 1; button->value = 1;}
+		if(button->timer > button_delay)
 		{
 			button->timer = button->value++;
+			button->state = 1;
 		}
 	}
 	else
 	{//Отпущена кнопка
 		button->value = 0;
+		button->state = 0;
 		button->timer = 0;
 	}
 }
@@ -48,10 +50,7 @@ void BUTTON_SetValue(uint16_t add, uint16_t sub, uint16_t min, uint16_t max, uin
 	}
 	else{old_sub =0;}
 }
-uint8_t BUTTON_OneShot(uint8_t *button)
-{
 
-}
 uint8_t Button_A_GetState(void)
 {
 	static uint8_t state = 0, trig = 0;
