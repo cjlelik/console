@@ -26,6 +26,5 @@ typedef struct {
 void BUTTON_GetState(BUTTONS_TypeDef *button);
 void _BUTTON_PROCESSING(GPIO_TypeDef *gpio_port, uint16_t gpio_pin, button_Typedef *button);
 void BUTTON_SetValue(uint16_t add, uint16_t sub, uint16_t min, uint16_t max, uint16_t *value);
-uint8_t Button_A_GetState(void);
 
 #endif /* BUTTON_H_ */

@@ -50,8 +50,16 @@ uint32_t c=0;
 BUTTONS_TypeDef buttons;
 uint16_t led_value =0;
 /* USER CODE END Variables */
-osThreadId defaultTaskHandle;
+osThreadId MainTaskHandle;
 osThreadId PeripheryHandle;
+osThreadId Task03Handle;
+osSemaphoreId button_aHandle;
+osSemaphoreId button_bHandle;
+osSemaphoreId button_cHandle;
+osSemaphoreId button_upHandle;
+osSemaphoreId button_downHandle;
+osSemaphoreId button_leftHandle;
+osSemaphoreId button_rightHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -60,6 +68,7 @@ osThreadId PeripheryHandle;
 
 void StartDefaultTask(void const * argument);
 void Peryphery(void const * argument);
+void Menu(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -93,6 +102,35 @@ void MX_FREERTOS_Init(void) {
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
 
+  /* Create the semaphores(s) */
+  /* definition and creation of button_a */
+  osSemaphoreDef(button_a);
+  button_aHandle = osSemaphoreCreate(osSemaphore(button_a), 255);
+
+  /* definition and creation of button_b */
+  osSemaphoreDef(button_b);
+  button_bHandle = osSemaphoreCreate(osSemaphore(button_b), 255);
+
+  /* definition and creation of button_c */
+  osSemaphoreDef(button_c);
+  button_cHandle = osSemaphoreCreate(osSemaphore(button_c), 255);
+
+  /* definition and creation of button_up */
+  osSemaphoreDef(button_up);
+  button_upHandle = osSemaphoreCreate(osSemaphore(button_up), 255);
+
+  /* definition and creation of button_down */
+  osSemaphoreDef(button_down);
+  button_downHandle = osSemaphoreCreate(osSemaphore(button_down), 255);
+
+  /* definition and creation of button_left */
+  osSemaphoreDef(button_left);
+  button_leftHandle = osSemaphoreCreate(osSemaphore(button_left), 255);
+
+  /* definition and creation of button_right */
+  osSemaphoreDef(button_right);
+  button_rightHandle = osSemaphoreCreate(osSemaphore(button_right), 255);
+
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
@@ -106,13 +144,17 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 512);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+  /* definition and creation of MainTask */
+  osThreadDef(MainTask, StartDefaultTask, osPriorityNormal, 0, 512);
+  MainTaskHandle = osThreadCreate(osThread(MainTask), NULL);
 
   /* definition and creation of Periphery */
   osThreadDef(Periphery, Peryphery, osPriorityNormal, 0, 512);
   PeripheryHandle = osThreadCreate(osThread(Periphery), NULL);
+
+  /* definition and creation of Task03 */
+  osThreadDef(Task03, Menu, osPriorityIdle, 0, 512);
+  Task03Handle = osThreadCreate(osThread(Task03), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -130,23 +172,18 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void const * argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
-	MenuInit();
+
   /* Infinite loop */
   for(;;)
   {
-	BUTTON_SetValue(buttons.A.value, buttons.C.value, 0, 160, &led_value);
-	if(buttons.B.value){led_value = 0;}
-	LedLightSet(led_value, led_value);
+	  xsprintf(vbuff, "c=%d", c++);
+	  LcdSizePutStr(vbuff, 0*5*1, 0*7*2, 1, 2, LCD_Color_Black);
 
-	if(buttons.Down.state){buttons.Down.state = 0; MenuDown();}
-	if(buttons.Up.state){buttons.Up.state = 0; MenuUp();}
-	if(buttons.Left.state){buttons.Left.state = 0; MenuLeft();}
-	if(buttons.Right.state){buttons.Right.state = 0; MenuRight();}
+		BUTTON_SetValue(buttons.A.value, buttons.C.value, 0, 160, &led_value);
+		if(buttons.B.value){led_value = 0;}
+		LedLightSet(led_value, led_value);
 
-	xsprintf(vbuff, "%-12S %-03D", MenuGetItem()->Text, MenuGetItem()->Value);
-	LcdSizePutStr(vbuff, 0, 1*8*2, 1, 2, LCD_Color_Black);
-
-    osDelay(50);
+		osDelay(50);
   }
   /* USER CODE END StartDefaultTask */
 }
@@ -174,6 +211,32 @@ void Peryphery(void const * argument)
 	osDelay(40);
   }
   /* USER CODE END Peryphery */
+}
+
+/* USER CODE BEGIN Header_Menu */
+/**
+* @brief Function implementing the Task03 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Menu */
+void Menu(void const * argument)
+{
+  /* USER CODE BEGIN Menu */
+	MenuInit();
+  /* Infinite loop */
+  for(;;)
+  {
+	if(buttons.Down.state){buttons.Down.state = 0; MenuDown();}
+	if(buttons.Up.state){buttons.Up.state = 0; MenuUp();}
+	if(buttons.Left.state){buttons.Left.state = 0; MenuLeft();}
+	if(buttons.Right.state){buttons.Right.state = 0; MenuRight();}
+
+	xsprintf(vbuff, "%-12S %-03D", MenuGetItem()->Text, MenuGetItem()->Value);
+	LcdSizePutStr(vbuff, 0, 1*8*2, 1, 2, LCD_Color_Black);
+    osDelay(40);
+  }
+  /* USER CODE END Menu */
 }
 
 /* Private application code --------------------------------------------------*/

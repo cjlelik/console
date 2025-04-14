@@ -79,4 +79,7 @@ menuItem* MenuGetItem(void)
 {
 	return selectedMenuItem;
 }
+void TickMenu()
+{
 
+}

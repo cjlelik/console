@@ -50,21 +50,3 @@ void BUTTON_SetValue(uint16_t add, uint16_t sub, uint16_t min, uint16_t max, uin
 	}
 	else{old_sub =0;}
 }
-
-uint8_t Button_A_GetState(void)
-{
-	static uint8_t state = 0, trig = 0;
-	if(BUTTON_A_GPIO_Port->IDR & BUTTON_A_Pin)
-	{
-		if(!state)
-		{
-			state = 1;
-			trig ^= 0b01;
-		}
-	}
-	else
-	{
-		state = 0;
-	}
-	return trig;
-}
